@@ -20,8 +20,6 @@ class PinsController extends AbstractController
         $this->em = $em;
     }
 
-
-
     #[Route('/', name: 'app_home', methods: 'GET')]
     public function index(PinRepository $pinRepository): Response
     {
@@ -57,7 +55,7 @@ class PinsController extends AbstractController
         ]); 
     }
 
-    #[Route("/pins/{id}<[0-9]+>/edit", name: 'app_pins_edit', methods: 'GET|PUT')]
+    #[Route("/pins/{id}<[0-9]+>/edit", name: 'app_pins_edit', methods: 'GET|POST')]
     public function edit(Pin $pin, Request $request): Response
     {   
         $form = $this->createForm(PinType::class, $pin);
@@ -67,12 +65,21 @@ class PinsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) { 
             $this->em->flush();
 
-            return $this->redirectToRoute('app_pins_show', ['id' => $pin->getId()]);
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('pins/edit.html.twig', [
             'pin'  => $pin,
             'form' => $form->createView()
         ]); 
+    }
+
+    #[Route("/pins/{id}<[0-9]+>/delete", name: 'app_pins_delete', methods: 'DELETE')]
+    public function delete(Pin $pin): Response
+    {   
+        $this->em->remove($pin);
+        $this->em->flush();
+        
+        return $this->redirectToRoute('app_home');
     }
 }

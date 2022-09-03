@@ -21,7 +21,7 @@ class PinType extends AbstractType
                     'cols' => 50
                 ]
             ])
-            ->setMethod('PUT');
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
