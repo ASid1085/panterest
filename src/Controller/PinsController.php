@@ -27,12 +27,6 @@ class PinsController extends AbstractController
         return $this->render('pins/index.html.twig', compact('pins'));
     }
 
-    #[Route("/pins/{id}<[0-9]+>", name: 'app_pins_show', methods: 'GET')]
-    public function show(Pin $pin): Response
-    {
-        return $this->render('pins/show.html.twig', compact('pin'));
-    }
-
     #[Route("/pins/create", name: 'app_pins_create', methods: 'GET|POST')]
     public function create(Request $request): Response
     {   
@@ -55,6 +49,12 @@ class PinsController extends AbstractController
         ]); 
     }
 
+    #[Route("/pins/{id}<[0-9]+>", name: 'app_pins_show', methods: 'GET')]
+    public function show(Pin $pin): Response
+    {
+        return $this->render('pins/show.html.twig', compact('pin'));
+    }
+
     #[Route("/pins/{id}<[0-9]+>/edit", name: 'app_pins_edit', methods: 'GET|POST')]
     public function edit(Pin $pin, Request $request): Response
     {   
@@ -74,7 +74,7 @@ class PinsController extends AbstractController
         ]); 
     }
 
-    #[Route("/pins/{id}<[0-9]+>/delete", name: 'app_pins_delete', methods: 'DELETE')]
+    #[Route("/pins/{id}<[0-9]+>", name: 'app_pins_delete', methods: 'DELETE')]
     public function delete(Pin $pin, Request $request): Response
     {   
         $token = $request->request->get('csrf_token');
