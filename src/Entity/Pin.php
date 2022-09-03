@@ -14,6 +14,7 @@ class Pin
 {
 
     use Timestampable;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
