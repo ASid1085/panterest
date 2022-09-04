@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Mime\Message;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PinRepository::class)]
@@ -36,6 +37,7 @@ class Pin
     private ?string $description = null;
 
     #[Vich\UploadableField(mapping: 'pin_image', fileNameProperty: 'imageName')]
+    #[Assert\Image(maxSize: "8M", maxSizeMessage: "The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.")]
     private ?File $imageFile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
