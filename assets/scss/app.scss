@@ -8,4 +8,26 @@ body {
 
 .alert {
     text-align: center;
-} 
+}
+
+.vich-image {
+    .form-check {
+        @extend .mt-3
+    }
+
+    img {
+        @extend .d-block;
+        @extend .rounded;
+        @extend .mx-auto;
+        @extend .img-thumbnail;
+    }
+}
+
+.pin img {
+    transition: transform 0.3s ease-out;
+
+    &:hover {
+        transform: scale(1.075);
+    }
+}
+ 
