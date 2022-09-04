@@ -7,10 +7,14 @@ use App\Repository\PinRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PinRepository::class)]
 #[ORM\Table(name: "pins")]
 #[ORM\HasLifecycleCallbacks]
+#[Vich\Uploadable]
+
 class Pin
 {
 
@@ -30,6 +34,9 @@ class Pin
     #[Assert\NotBlank(message: "Title can't be blank")]
     #[Assert\Length(min: 10)]
     private ?string $description = null;
+
+    #[Vich\UploadableField(mapping: 'pin_image', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageName = null;
@@ -63,6 +70,25 @@ class Pin
         return $this;
     }
 
+    /**
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes  if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->setUpdatedAt(new \DateTimeImmutable);
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
     public function getImageName(): ?string
     {
         return $this->imageName;
@@ -74,4 +100,6 @@ class Pin
 
         return $this;
     }
+
+
 }
