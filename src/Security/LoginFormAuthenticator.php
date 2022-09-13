@@ -14,6 +14,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -47,6 +48,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
+        $user = $token->getUser();
+        $request->getSession()->getFlashBag()->add('success', 'Welcome ' . $user->getFirstName() . ' ' . $user->getLastName() . ' !');
         return new RedirectResponse($this->urlGenerator->generate('app_home'));
         //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
