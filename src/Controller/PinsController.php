@@ -30,66 +30,91 @@ class PinsController extends AbstractController
     #[Route("/pins/create", name: 'app_pins_create', methods: 'GET|POST')]
     public function create(Request $request): Response
     {   
-        $pin = new Pin;
+        $user_current = $this->getUser();
+        if(!$user_current) {
+            $this->addFlash('info', 'For creating pin thanks sign in or register.');
 
-        $form = $this->createForm(PinType::class, $pin);
+                return $this->redirectToRoute('app_login');
+        } else {
+            $pin = new Pin;
 
-        $form->handleRequest($request);
+            $form = $this->createForm(PinType::class, $pin);
 
-        if ($form->isSubmitted() && $form->isValid()) { 
+            $form->handleRequest($request);
 
-            $this->em->persist($pin);
-            $this->em->flush();
+            if ($form->isSubmitted() && $form->isValid()) { 
 
-            $this->addFlash('success', 'Pin successfully created !');
+                $pin->setUser($user_current);
 
-            return $this->redirectToRoute('app_pins_show', ['id' => $pin->getId()]);
+                $this->em->persist($pin);
+                $this->em->flush();
+
+                $this->addFlash('success', 'Pin successfully created !');
+
+                return $this->redirectToRoute('app_pins_show', ['id' => $pin->getId()]);
+            }
+
+            return $this->render('pins/create.html.twig', [
+                'form' => $form->createView()
+            ]); 
         }
-
-        return $this->render('pins/create.html.twig', [
-            'form' => $form->createView()
-        ]); 
     }
 
-    #[Route("/pins/{id}<[0-9]+>", name: 'app_pins_show', methods: 'GET')]
+    #[Route("/pins/{id}", name: 'app_pins_show', methods: 'GET')]
     public function show(Pin $pin): Response
     {
         return $this->render('pins/show.html.twig', compact('pin'));
     }
 
-    #[Route("/pins/{id}<[0-9]+>/edit", name: 'app_pins_edit', methods: 'GET|POST')]
+    #[Route("/pins/{id}/edit", name: 'app_pins_edit', methods: 'GET|POST')]
     public function edit(Pin $pin, Request $request): Response
     {   
-        $form = $this->createForm(PinType::class, $pin);
+        $user_current = $this->getUser();
+        if(!$user_current || $user_current != $pin->getUser()) {
+            $this->addFlash('warning', 'You cannot edit this pin.');
 
-        $form->handleRequest($request);
+            return $this->render('pins/show.html.twig', compact('pin'));
+        } else {
+            $form = $this->createForm(PinType::class, $pin);
 
-        if ($form->isSubmitted() && $form->isValid()) { 
-            $this->em->flush();
+            $form->handleRequest($request);
 
-            $this->addFlash('success', 'Pin successfully updated !');
+            if ($form->isSubmitted() && $form->isValid()) { 
+                $this->em->flush();
 
-            return $this->redirectToRoute('app_home');
+                $this->addFlash('success', 'Pin successfully updated !');
+
+                return $this->redirectToRoute('app_home');
+            }
+
+            return $this->render('pins/edit.html.twig', [
+                'pin'  => $pin,
+                'form' => $form->createView(),
+            ]); 
         }
-
-        return $this->render('pins/edit.html.twig', [
-            'pin'  => $pin,
-            'form' => $form->createView(),
-        ]); 
+        
     }
 
-    #[Route("/pins/{id}<[0-9]+>", name: 'app_pins_delete', methods: 'DELETE')]
+    #[Route("/pins/{id}", name: 'app_pins_delete', methods: 'DELETE')]
     public function delete(Pin $pin, Request $request): Response
     {   
-        $token = $request->request->get('csrf_token');
+        $user_current = $this->getUser();
+        if(!$user_current || $user_current != $pin->getUser()) {
+            $this->addFlash('warning', 'You cannot delete this pin.');
 
-        if($this->isCsrfTokenValid('pin_deletion_' . $pin->getId(), $token)) {
-            $this->em->remove($pin);
-            $this->em->flush();
+            return $this->render('pins/show.html.twig', compact('pin'));
+        } else {
+            $token = $request->request->get('csrf_token');
+
+            if($this->isCsrfTokenValid('pin_deletion_' . $pin->getId(), $token)) {
+                $this->em->remove($pin);
+                $this->em->flush();
+            }
+
+            $this->addFlash('info', 'Pin successfully deleted !');
+            
+            return $this->redirectToRoute('app_home');
         }
-
-        $this->addFlash('info', 'Pin successfully deleted !');
         
-        return $this->redirectToRoute('app_home');
     }
 }
