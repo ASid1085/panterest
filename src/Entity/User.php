@@ -157,8 +157,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function getGravatar(?int $size = 200): ?string {
-        return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->getEmail()))) . '/?s=' . $size;
-        //return 'https://www.gravatar.com/avatar/ae79a04b01363b8b723939d618e66bc6/?s=' . $size;
+        return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->getEmail()))) . '?s=' . $size;
+        //return 'https://www.gravatar.com/avatar/ae79a04b01363b8b723939d618e66bc6?s=' . $size;
         
     }
 
