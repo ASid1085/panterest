@@ -28,11 +28,11 @@ class Pin
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Assert\NotBlank(message: "Title can't be blank")]
     #[Assert\Length(min: 3)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: "Title can't be blank")]
     #[Assert\Length(min: 10)]
     private ?string $description = null;
 
